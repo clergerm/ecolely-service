@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
     @GetMapping("/")
     public String healthCheck() {
-        return "Ecolely is running!";
+        return "Ecolely Service is running!";
     }
 }
