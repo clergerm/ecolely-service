@@ -5,13 +5,19 @@
 
 package com.ecolely.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.ecolely.constants.EcolelyConstants.HEALTH_API;
+import static com.ecolely.constants.EcolelyConstants.ROOT_API;
+
 @RestController
+@RequestMapping(value = ROOT_API, produces = MediaType.APPLICATION_JSON_VALUE)
 public class HealthController {
-    @GetMapping("/")
+    @GetMapping(HEALTH_API)
     public String healthCheck() {
-        return "Ecolely Service is running!";
+        return "Ecolely Service is live!";
     }
 }
