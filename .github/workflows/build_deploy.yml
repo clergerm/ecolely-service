@@ -1,5 +1,5 @@
 # Naming the workflow
-name: Build Ecolely Service
+name: Build and Deploy
 
 # Defines the events that trigger the workflow
 on:
