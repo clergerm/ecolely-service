@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build Application
+    name: Build application
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,18 +34,18 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download JAR
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: ecolely-service
 
-      - name: Setup SSH Key
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{secrets.EC2_SSH_PRIVATE_KEY}}" > ~/.ssh/ec2.pem
           chmod 600 ~/.ssh/ec2.pem
 
-      - name: Copy JAR to EC2
+      - name: Copy artifact (JAR) to EC2
         run: |
           scp \
            -i ~/.ssh/ec2.pem \
