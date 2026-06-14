@@ -48,7 +48,7 @@ jobs:
       - name: Copy JAR to EC2
         run: |
           scp \
-           -i ~/.ssh/ec2.pem
-           -o StrictHostKeyChecking = no \
+           -i ~/.ssh/ec2.pem \
+           -o StrictHostKeyChecking=no \
           *.jar \
           ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_SSH_HOST }}:/opt/ecolely-service/app.jar
