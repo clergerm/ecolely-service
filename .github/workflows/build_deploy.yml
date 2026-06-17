@@ -30,7 +30,7 @@ jobs:
           path: target/*.jar
 
   deploy:
-    environment: test
+    environment: dev
     name: Deploy to EC2
     needs: build
     runs-on: ubuntu-latest
