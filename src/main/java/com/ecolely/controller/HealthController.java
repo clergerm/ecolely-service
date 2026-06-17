@@ -18,6 +18,6 @@ import static com.ecolely.constants.EcolelyConstants.ROOT_API;
 public class HealthController {
     @GetMapping(HEALTH_API)
     public String healthCheck() {
-        return "Ecolely Service in test is live!";
+        return "Ecolely Service is live!";
     }
 }
