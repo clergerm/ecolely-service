@@ -23,7 +23,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B clean package
 
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: ecolely-service
@@ -35,7 +35,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: ecolely-service
@@ -46,7 +46,7 @@ jobs:
           echo "${{secrets.EC2_SSH_PRIVATE_KEY}}" > ~/.ssh/ec2.pem
           chmod 600 ~/.ssh/ec2.pem
 
-      - name: Copy artifact (JAR) to EC2
+      - name: Copy build artifact to EC2
         run: |
           scp \
            -i ~/.ssh/ec2.pem \
