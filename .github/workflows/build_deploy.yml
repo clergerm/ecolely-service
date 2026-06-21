@@ -7,6 +7,11 @@ on:
   pull_request:
     branches: [develop, main]
 
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  IMAGE_TAG: ${{ github.sha }}
+
 jobs:
   build:
     name: Build application
@@ -15,47 +20,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-        # Showing projects files on the runner
-      - run: ls
+      - name: Step up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
 
-#      - name: Step up JDK 21
-#        uses: actions/setup-java@v5
-#        with:
-#          java-version: '21'
-#          distribution: 'temurin'
-#          cache: maven
-#
-#      - name: Build with Maven
-#        run: mvn -B clean package
-#
-#      - name: Upload build artifact
-#        uses: actions/upload-artifact@v5
-#        with:
-#          name: ecolely-service
-#          path: target/*.jar
+      - name: Build with Maven
+        run: mvn -B clean package
 
-#  deploy:
-#    environment: dev
-#    name: Deploy to EC2
-#    needs: build
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download build artifact
-#        uses: actions/download-artifact@v5
-#        with:
-#          name: ecolely-service
-#          path: ./
-#
-#      - name: Setup SSH key
-#        run: |
-#          mkdir -p ~/.ssh
-#          echo "${{secrets.EC2_SSH_PRIVATE_KEY}}" > ~/.ssh/ec2.pem
-#          chmod 600 ~/.ssh/ec2.pem
-#
-#      - name: Copy build artifact to EC2
-#        run: |
-#          scp \
-#           -i ~/.ssh/ec2.pem \
-#           -o StrictHostKeyChecking=no \
-#          *.jar \
-#          ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_SSH_HOST }}:/opt/ecolely-service/app.jar
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Build a docker image
+      - name: Build Docker image
+        run: docker build -t ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG .
+
+      # Push docker image to ECR so that it can be deployed to ECS.
+      - name: Push Docker image to ECR
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
