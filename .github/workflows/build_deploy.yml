@@ -15,7 +15,7 @@ env:
 jobs:
   # Build and Push Docker Image to ECR
   build:
-    name: Build and Push Docker Image
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
