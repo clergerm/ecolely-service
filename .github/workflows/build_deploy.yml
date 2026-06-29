@@ -50,7 +50,7 @@ jobs:
 
   deploy:
     # Deploy updated ECS task definition (using new ECR image)
-    name: Deploy to ECS (Dev)
+    name: Deploy to ECS
     needs: build
     runs-on: ubuntu-latest
     environment: dev
