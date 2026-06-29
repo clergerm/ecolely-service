@@ -76,7 +76,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Update ECS task definition image
+      - name: Update task definition with new image ID
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -84,7 +84,7 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
-      - name: Deploy Amazon ECS task definition
+      - name: Deploy task definition to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
