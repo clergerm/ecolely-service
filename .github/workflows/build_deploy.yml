@@ -5,18 +5,6 @@ name: Build and Deploy
 on:
   pull_request:
     branches: [main, develop]
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment'
-        type: environment
-        required: true
-
-      deploy:
-        description: 'Deploy?'
-        required: true
-        type: boolean
-        default: false
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -32,7 +20,7 @@ jobs:
   build:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: dev
 
     steps:
       - name: Checkout
@@ -70,7 +58,7 @@ jobs:
     name: Deploy to ECS
     needs: build
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: dev
 
     env:
       ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
