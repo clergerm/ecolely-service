@@ -3,7 +3,6 @@ name: Build and Deploy
 
 # Defines the events that trigger the workflow
 on:
-  push:
   pull_request:
     branches: [develop, main]
   workflow_dispatch:
