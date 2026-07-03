@@ -5,6 +5,27 @@ name: Build and Deploy
 on:
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to build"
+        required: true
+        type: string
+
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+          - prod
+
+      deploy:
+        description: "Deploy?"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -20,8 +41,6 @@ jobs:
   build:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    environment: dev
-
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -54,7 +73,7 @@ jobs:
 
   deploy:
     # Deploy updated ECS task definition (using new ECR image)
-    if: ${{ inputs.deploy }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
     name: Deploy to ECS
     needs: build
     runs-on: ubuntu-latest
