@@ -3,9 +3,29 @@ name: Build and Deploy
 
 # Defines the events that trigger the workflow
 on:
-  push:
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to build"
+        required: true
+        type: string
+
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+          - prod
+
+      deploy:
+        description: "Deploy?"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   id-token: write # This is required for requesting the JWT
