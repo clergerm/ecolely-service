@@ -3,6 +3,7 @@ name: Build and Deploy
 
 # Defines the events that trigger the workflow
 on:
+  push:
   pull_request:
     branches: [main, develop]
 
@@ -52,7 +53,7 @@ jobs:
 
   deploy:
     # Deploy updated ECS task definition (using new ECR image)
-    if: ${{ inputs.deploy }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
     name: Deploy to ECS
     needs: build
     runs-on: ubuntu-latest
