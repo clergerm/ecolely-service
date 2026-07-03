@@ -1,8 +1,6 @@
 # Naming the workflow
 name: Build and Deploy
 
-run-name: Build and Deploy ${{ github.event.repository.name }} (${{ inputs.environment }})
-
 # Defines the events that trigger the workflow
 on:
   push:
