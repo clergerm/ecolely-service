@@ -61,7 +61,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          repository: clergerm/${{ inputs.repository }}
+          repository:  ${{ github.event_name == 'workflow_dispatch' && format('clergerm/{0}', inputs.repository) || github.repository }}
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref_name }}
 
       - name: Step up Java
