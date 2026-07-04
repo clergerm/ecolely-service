@@ -3,29 +3,43 @@ name: Build and Deploy
 
 # Defines the events that trigger the workflow
 on:
+  push:
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
     inputs:
-      branch:
-        description: "Branch to build"
-        required: true
-        type: string
-
       environment:
-        description: "Target environment"
+        description: 'Select the environment'
         required: true
+        default: 'dev'
         type: choice
         options:
           - dev
           - test
           - prod
 
+      repository:
+        description: "Select repository"
+        required: true
+        default: 'ecolely-service'
+        type: choice
+        options:
+          - ecolely-service
+          - ecolely-ui
+
+      branch:
+        description: "Branch to checkout"
+        required: true
+        type: string
+
       deploy:
         description: "Deploy?"
         required: true
-        type: boolean
-        default: false
+        default: 'false'
+        type: choice
+        options:
+          - true
+          - false
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -37,15 +51,17 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  # Build and Push Docker Image to ECR
+  # Build with Maven
   build:
-    name: Build & Push Docker Image
+    name: Build with Maven
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.branch || github.ref_name }}
+          repository: ${{ github.event_name == 'workflow_dispatch' && format('clergerm/{0}', inputs.repository) || github.repository }}
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref_name }}
 
       - name: Step up Java
         uses: actions/setup-java@v5
@@ -54,8 +70,30 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build the JAR with Maven
+      - name: Build JAR artifact
         run: mvn -B clean package
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: ecolely-service
+          path: target/*.jar
+
+  # Build and Push Docker Image to ECR
+  push:
+    # Push only for manual runs when deploy is true.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy == 'true' }}
+    name: Build & Push Docker Image
+    needs: build
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: ecolely-service
+          path: ./target
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -74,12 +112,12 @@ jobs:
         run: docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
 
   deploy:
-    # Deploy updated ECS task definition (using new ECR image)
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+    # Deploy only for manual runs when deploy is true.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy == 'true' }}
     name: Deploy to ECS
-    needs: build
+    needs: push
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ inputs.environment }}
 
     env:
       ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
@@ -91,6 +129,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
+          repository: clergerm/${{ inputs.repository }}
           ref: ${{ inputs.branch }}
 
       - name: Configure AWS credentials
