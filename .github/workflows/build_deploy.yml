@@ -52,9 +52,11 @@ env:
 
 jobs:
   # Build and Push Docker Image to ECR
-  build:
+  build-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    environment: dev
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -73,26 +75,34 @@ jobs:
         run: mvn -B clean package
 
       - name: Configure AWS credentials
+        # Run for non-manual workflows or manual runs without deployment.
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.deploy == 'false' }}
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Log in to ECR
+        # Run for non-manual workflows or manual runs without deployment.
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.deploy == 'false' }}
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Docker image
+        # Run for non-manual workflows or manual runs without deployment.
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.deploy == 'false' }}
         run: docker build -t ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG .
 
       - name: Push Docker image to ECR
+        # Run for non-manual workflows or manual runs without deployment.
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.deploy == 'false' }}
         run: docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
 
   deploy:
-    # Deploy updated ECS task definition (using new ECR image)
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+    # Deploy only for manual runs when deploy is true.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy == 'true' }}
     name: Deploy to ECS
-    needs: build
+    needs: build-push
     runs-on: ubuntu-latest
     environment: dev
 
