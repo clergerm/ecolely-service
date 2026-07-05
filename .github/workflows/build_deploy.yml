@@ -63,6 +63,11 @@ jobs:
         with:
           ref:  ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.head_ref  || github.ref_name }}
 
+      - name: Show environment
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Input environment: ${{ inputs.environment }}"
+
       - name: Step up Java
         uses: actions/setup-java@v5
         with:
