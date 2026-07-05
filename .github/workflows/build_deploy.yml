@@ -18,20 +18,6 @@ on:
           - test
           - prod
 
-#      repository:
-#        description: "Select repository"
-#        required: true
-#        default: 'ecolely-service'
-#        type: choice
-#        options:
-#          - ecolely-service
-#          - ecolely-ui
-
-#      branch:
-#        description: "Branch to checkout"
-#        required: true
-#        type: string
-
       deploy:
         description: "Deploy?"
         required: true
@@ -63,16 +49,11 @@ jobs:
         with:
           ref:  ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.head_ref  || github.ref_name }}
 
-      - name: Show environment
-        run: |
-          echo "Event: ${{ github.event_name }}"
-          echo "Input environment: ${{ inputs.environment }}"
-
       - name: Step up Java
         uses: actions/setup-java@v5
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution: 'corretto'
           cache: maven
 
       - name: Build the JAR with Maven
