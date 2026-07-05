@@ -18,20 +18,6 @@ on:
           - test
           - prod
 
-#      repository:
-#        description: "Select repository"
-#        required: true
-#        default: 'ecolely-service'
-#        type: choice
-#        options:
-#          - ecolely-service
-#          - ecolely-ui
-
-#      branch:
-#        description: "Branch to checkout"
-#        required: true
-#        type: string
-
       deploy:
         description: "Deploy?"
         required: true
