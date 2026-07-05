@@ -61,7 +61,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref:  ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref_name }}
+          ref:  ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.head_ref  || github.ref_name }}
 
       - name: Step up Java
         uses: actions/setup-java@v5
