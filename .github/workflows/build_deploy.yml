@@ -18,14 +18,14 @@ on:
           - test
           - prod
 
-      repository:
-        description: "Select repository"
-        required: true
-        default: 'ecolely-service'
-        type: choice
-        options:
-          - ecolely-service
-          - ecolely-ui
+#      repository:
+#        description: "Select repository"
+#        required: true
+#        default: 'ecolely-service'
+#        type: choice
+#        options:
+#          - ecolely-service
+#          - ecolely-ui
 
 #      branch:
 #        description: "Branch to checkout"
@@ -48,7 +48,7 @@ permissions:
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-  IMAGE_TAG: ${{ github.sha }}
+  IMAGE_TAG: ${{ github.sha }}-${{ github.run_number }}
 
 jobs:
   # Build and Push Docker Image to ECR
