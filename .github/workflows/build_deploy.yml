@@ -13,10 +13,13 @@ on:
         required: true
         default: 'dev'
         type: choice
-        options:
-          - dev
-          - test
-          - prod
+        options: [dev, test, prod]
+
+      repository:
+        description: "Service"
+        required: true
+        type: choice
+        options: [ ecolely-service, ecolely-ui ]
 
       deploy:
         description: "Deploy?"
