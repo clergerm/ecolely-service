@@ -73,9 +73,16 @@ jobs:
         id: check-image
         shell: bash
         run: |
-          aws ecr describe-images \
+          if aws ecr describe-images \
             --repository-name "$ECR_REPOSITORY" \
-            --image-ids imageTag="$IMAGE_TAG"
+            --image-ids imageTag="$IMAGE_TAG" \
+            >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Image already exists in ECR."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Image does not exist in ECR."
+          fi
 
       - name: Build Docker image
         if: steps.check-image.outputs.exists == 'false'
