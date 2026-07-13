@@ -67,6 +67,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.ECS_DEPLOY_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
 
       - name: Log in to ECR
         id: login-ecr
@@ -117,6 +118,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.ECS_DEPLOY_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
 
       - name: Login to Amazon ECR
         id: login-ecr
