@@ -11,4 +11,5 @@ public final class EcolelyConstants {
     }
     public static final String ROOT_API = "/api/ecolely-service";
     public static final String HEALTH_API = "/health";
+    public static final String COURSES = "/courses";
 }
